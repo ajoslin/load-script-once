@@ -20,6 +20,7 @@
     "once"
   ],
   "devDependencies": {
+    "after": "~0.8.2",
     "proxyquire": "~1.7.10",
     "standard": "^7.0.0",
     "tape": "~4.6.0"
@@ -28,7 +29,6 @@
     "*.js"
   ],
   "dependencies": {
-    "after": "~0.8.2",
     "load-script": "~1.0.0"
   }
 }
