@@ -11,7 +11,7 @@ module.exports = function loadScriptOnce (src, callback) {
       success: false
     }
   }
-  if (result.success) return callback()
+  if (result.success) return process.nextTick(callback);
 
   result.callbacks.push(callback)
   if (result.callbacks.length === 1) {
