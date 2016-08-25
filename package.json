@@ -1,0 +1,31 @@
+{
+  "name": "load-script-once",
+  "main": "index.js",
+  "version": "0.0.0",
+  "description": "load a script, but only once",
+  "license": "MIT",
+  "repository": "ajoslin/load-script-once",
+  "author": {
+    "name": "Andrew Joslin",
+    "email": "andrewtjoslin@gmail.com",
+    "url": "ajoslin.com"
+  },
+  "scripts": {
+    "test": "standard"
+  },
+  "keywords": [
+    "load-script",
+    "async",
+    "script",
+    "once"
+  ],
+  "devDependencies": {
+    "standard": "^7.0.0"
+  },
+  "files": [
+    "*.js"
+  ],
+  "dependencies": {
+    "load-script": "~1.0.0"
+  }
+}
