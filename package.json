@@ -11,7 +11,7 @@
     "url": "ajoslin.com"
   },
   "scripts": {
-    "test": "standard"
+    "test": "standard && tape test.js"
   },
   "keywords": [
     "load-script",
@@ -20,12 +20,15 @@
     "once"
   ],
   "devDependencies": {
-    "standard": "^7.0.0"
+    "proxyquire": "~1.7.10",
+    "standard": "^7.0.0",
+    "tape": "~4.6.0"
   },
   "files": [
     "*.js"
   ],
   "dependencies": {
+    "after": "~0.8.2",
     "load-script": "~1.0.0"
   }
 }

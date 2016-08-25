@@ -1,15 +1,32 @@
 'use strict'
 
-const loadScript = require('load-script')
-const cache = {}
+var loadScript = require('load-script')
+var cache = {}
 
 module.exports = function loadScriptOnce (src, callback) {
-  if (cache[src]) return callback()
+  var result = cache[src]
+  if (!cache[src]) {
+    result = cache[src] = {
+      callbacks: [],
+      success: false
+    }
+  }
+  if (result.success) return callback()
 
-  loadScript(src, function scriptLoaded (error) {
-    if (error) return callback(error)
+  result.callbacks.push(callback)
+  if (result.callbacks.length === 1) {
+    loadScript(src, onScriptLoad)
+  }
 
-    cache[src] = true
-    callback()
-  })
+  function onScriptLoad (error) {
+    var callbacks = result.callbacks
+    if (!error) result.success = true
+
+    // Empty this array before finishing, because these callbacks
+    // could cause more loadScriptOnce calls
+    result.callbacks = []
+    callbacks.forEach(function (callback) {
+      callback(error)
+    })
+  }
 }
