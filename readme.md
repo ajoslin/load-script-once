@@ -14,9 +14,9 @@ $ npm install --save load-script-once
 ```js
 var loadScriptOnce = require('load-script-once')
 
-loadScriptOnce('http://site.com/script.js', function (error) {
-  // done! Call loadScriptOnce again, and it will instantly succeed.
-})
+loadScriptOnce('http://site.com/script.js')
+  .then(() => /* success! */)
+  .catch(err => console.error('failed to load!', err)
 ```
 
 ## API
@@ -31,7 +31,7 @@ If the request failed, the next loadScriptOnce call will try to fetch the script
 
 Once a request for a script is successful, future loadScriptOnce calls for that src will effectively be a noop.
 
-#### `loadScriptOnce(src, callback)`
+#### `var promise = loadScriptOnce(src)`
 
 ##### src
 
@@ -39,12 +39,6 @@ Once a request for a script is successful, future loadScriptOnce calls for that 
 Type: `string`
 
 The script src to load
-
-##### callback
-
-Type: `function`
-
-Called once the script loads, or with `error` if loading failed.
 
 ## License
 

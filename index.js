@@ -4,29 +4,23 @@ var loadScript = require('load-script')
 var cache = {}
 
 module.exports = function loadScriptOnce (src, callback) {
-  var result = cache[src]
-  if (!cache[src]) {
-    result = cache[src] = {
-      callbacks: [],
-      success: false
-    }
-  }
-  if (result.success) return setTimeout(callback, 0)
-
-  result.callbacks.push(callback)
-  if (result.callbacks.length === 1) {
-    loadScript(src, onScriptLoad)
+  var promise = cache[src]
+  if (!promise) {
+    promise = cache[src] = doLoad(src)
   }
 
-  function onScriptLoad (error) {
-    var callbacks = result.callbacks
-    if (!error) result.success = true
+  if (callback) {
+    promise.then(callback, callback)
+  }
 
-    // Empty this array before finishing, because these callbacks
-    // could cause more loadScriptOnce calls
-    result.callbacks = []
-    callbacks.forEach(function (callback) {
-      callback(error)
+  return promise
+}
+
+function doLoad (src) {
+  return new Promise(function (resolve, reject) {
+    loadScript(src, function (error) {
+      if (error) return reject(error)
+      else resolve()
     })
-  }
+  })
 }
