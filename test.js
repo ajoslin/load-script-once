@@ -23,12 +23,28 @@ test('queue success', function (t) {
   }
 })
 
+test('promises', async t => {
+  let callCount = 0
+  const loadScriptOnce = proxyquire('./', {
+    'load-script': (src, cb) => {
+      callCount++
+      setTimeout(cb, 1)
+    }
+  })
+
+  await loadScriptOnce('foo')
+  await loadScriptOnce('foo')
+  await loadScriptOnce('foo')
+  t.equal(callCount, 1)
+  t.end()
+})
+
 test('queue error', function (t) {
   let callCount = 0
   const loadScriptOnce = proxyquire('./', {
     'load-script': (src, cb) => {
       callCount++
-      setTimeout(() => cb('err'), 1)
+      setTimeout(() => cb(new Error('err')), 1)
     }
   })
 
@@ -38,9 +54,28 @@ test('queue error', function (t) {
   t.plan(4)
 
   function done (error) {
-    t.equal(error, 'err')
+    t.equal(error.message, 'err')
     t.equal(callCount, 1)
   }
+})
+
+test('promises queue error', async function (t) {
+  let callCount = 0
+  const loadScriptOnce = proxyquire('./', {
+    'load-script': (src, cb) => {
+      callCount++
+      setTimeout(() => cb(new Error('err')), 1)
+    }
+  })
+
+  try {
+    await Promise.all([loadScriptOnce('foo'), loadScriptOnce('foo')])
+  } catch (error) {
+    t.equal(error.message, 'err')
+  }
+
+  t.equal(callCount, 1)
+  t.end()
 })
 
 test('queue error then success', function (t) {
@@ -49,7 +84,7 @@ test('queue error then success', function (t) {
     'load-script': (src, cb) => {
       callCount++
       if (callCount === 1) {
-        setTimeout(() => cb('err'), 1)
+        setTimeout(() => cb(new Error('err')), 1)
       } else {
         setTimeout(cb, 1)
       }
@@ -64,7 +99,7 @@ test('queue error then success', function (t) {
   loadScriptOnce('foo', doneErr)
 
   function doneErr (error) {
-    t.equal(error, 'err')
+    t.equal(error.message, 'err')
     loadSuccess()
   }
 
@@ -98,4 +133,37 @@ test('doesnt cache different srcs', function (t) {
   t.equal(callCount, 2)
 
   function done () {}
+})
+
+test('promises queue error then success', async function (t) {
+  let callCount = 0
+  const loadScriptOnce = proxyquire('./', {
+    'load-script': (src, cb) => {
+      callCount++
+      if (callCount === 1) {
+        setTimeout(() => cb(new Error('err')), 1)
+      } else {
+        setTimeout(cb, 1)
+      }
+    }
+  })
+
+  try {
+    await loadScriptOnce('foo')
+  } catch (error) {
+    t.equal(error.message, 'err')
+    t.equal(callCount, 1)
+  }
+  try {
+    // Retry, this one works
+    await loadScriptOnce('foo')
+  } catch (error) {
+    t.equal(error.message, 'err')
+    t.equal(callCount, 2)
+  }
+
+  // It worked, no more retries
+  await loadScriptOnce('foo')
+  t.equal(callCount, 2)
+  t.end()
 })
