@@ -9,7 +9,7 @@ module.exports = function loadScriptOnce (src, callback) {
     promise = cache[src] = doLoad(src)
 
     // On error, fail to allow retry
-    promise.catch(() => {
+    promise.catch(function () {
       delete cache[src]
     })
   }
